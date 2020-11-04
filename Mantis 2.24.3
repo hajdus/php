@@ -1,0 +1,25 @@
+
+Location: www\mantis\vendor\adodb\adodb-php\drivers
+
+function _connect($argHostname, $argUsername, $argPassword, $argDatabasename)
+	{
+		if (!function_exists('sqlsrv_connect')) return null;
+		$connectionInfo = $this->connectionInfo;
+		$connectionInfo["Database"]=$argDatabasename;
+		$connectionInfo["UID"]=$argUsername;
+		$connectionInfo["PWD"]=$argPassword;
+		$connectionInfo["CharacterSet"]='UTF-8';
+		
+		foreach ($this->connectionParameters as $parameter=>$value)
+		    $connectionInfo[$parameter] = $value;
+		
+		if ($this->debug) ADOConnection::outp("<hr>connecting... hostname: $argHostname params: ".var_export($connectionInfo,true));
+		//if ($this->debug) ADOConnection::outp("<hr>_connectionID before: ".serialize($this->_connectionID));
+		if(!($this->_connectionID = sqlsrv_connect($argHostname,$connectionInfo))) {
+			if ($this->debug) ADOConnection::outp( "<hr><b>errors</b>: ".print_r( sqlsrv_errors(), true));
+			return false;
+		}
+		//if ($this->debug) ADOConnection::outp(" _connectionID after: ".serialize($this->_connectionID));
+		//if ($this->debug) ADOConnection::outp("<hr>defined functions: <pre>".var_export(get_defined_functions(),true)."</pre>");
+		return true;
+	}

@@ -23,3 +23,31 @@ function _connect($argHostname, $argUsername, $argPassword, $argDatabasename)
 		//if ($this->debug) ADOConnection::outp("<hr>defined functions: <pre>".var_export(get_defined_functions(),true)."</pre>");
 		return true;
 	}
+
+Location: www\mantis\core\database_api.php
+
+function db_prepare_binary_string( $p_string ) {
+	global $g_db;
+	$t_db_type = config_get_global( 'db_type' );
+
+	switch( $t_db_type ) {
+		case 'mssql':
+		case 'mssqlnative':
+		case 'odbc_mssql':
+		case 'ado_mssql':
+			$t_content = unpack( 'H*hex', $p_string );
+			return '0x' . $t_content['hex'];
+			break;
+		case 'postgres':
+		case 'postgres64':
+		case 'postgres7':
+		case 'pgsql':
+			return $g_db->BlobEncode( $p_string );
+			break;
+		case 'oci8':
+			# Fall through, oci8 stores raw data in BLOB
+		default:
+			return $p_string;
+			break;
+	}
+}
